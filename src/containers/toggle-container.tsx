@@ -1,69 +1,58 @@
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { NavLink } from "react-router-dom"
 import { MainRoutes } from "@/lib/helper"
-import { useAuth } from "@clerk/clerk-react" // ✅ Missing import
-
+import { useAuth } from "@clerk/clerk-react"
+import { LogoContainer } from "@/components/logo-container"
 
 export const ToggleContainer = () => {
-    const { userId } = useAuth()
+  const { userId } = useAuth()
 
   return (
-
-    
-<Sheet>
-  <SheetTrigger className="block md:hidden">
-    <Menu/>
-
-  </SheetTrigger>
-  <SheetContent>
-    {/* <SheetHeader>
-      <SheetTitle>Are you absolutely sure?</SheetTitle>
-      <SheetDescription>
-        This action cannot be undone. This will permanently delete your account
-        and remove your data from our servers.
-      </SheetDescription>
-    </SheetHeader> */}
-    <nav>
-        <ul className="flex flex-col items-start gap-8">
-                   {MainRoutes.map((route: { href: string; label: string }) => (
-                <li key={route.href}>
-                  <NavLink
-                    to={route.href}
-                    className={({ isActive }) =>
-                      cn(
-                        "text-base text-neutral-600 hover:text-neutral-900",
-                        isActive && "text-neutral-900 font-semibold"
-                      )
-                    }
-                  >
-                    {route.label}
-                  </NavLink>
-                </li>
-              ))}
-              {userId && (
+    <Sheet>
+      <SheetTrigger className="block md:hidden">
+        <Menu />
+      </SheetTrigger>
+      <SheetContent className="p-6 flex flex-col items-center gap-8">
+        <LogoContainer />
+        <nav className="w-full">
+          <ul className="flex flex-col items-center gap-8 w-full">
+            {MainRoutes.map((route: { href: string; label: string }) => (
+              <li key={route.href} className="w-full">
                 <NavLink
-                  to="/generate"
+                  to={route.href}
                   className={({ isActive }) =>
                     cn(
-                      "text-base text-neutral-600 hover:text-neutral-900",
-                      isActive && "text-neutral-900 font-semibold"
+                      "block w-full text-base text-neutral-600 hover:text-neutral-900 px-2 py-1 rounded",
+                      isActive && "text-neutral-900 font-semibold bg-neutral-100"
                     )
                   }
                 >
-                  Take an Interview
+                  {route.label}
                 </NavLink>
-              )}
-        </ul>
-    </nav>
-  </SheetContent>
-</Sheet>  )
+              </li>
+            ))}
+            {userId && (
+              <NavLink
+                to="/generate"
+                className={({ isActive }) =>
+                  cn(
+                    "block w-full text-base text-neutral-600 hover:text-neutral-900 px-2 py-1 rounded",
+                    isActive && "text-neutral-900 font-semibold bg-neutral-100"
+                  )
+                }
+              >
+                Take an Interview
+              </NavLink>
+            )}
+          </ul>
+        </nav>
+      </SheetContent>
+    </Sheet>
+  )
 }
