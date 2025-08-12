@@ -1,25 +1,40 @@
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { Menu } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Container } from "./container"
-import { LogoContainer } from "./logo-container"
 import { NavLink } from "react-router-dom"
-import { MainRoutes } from "./MainRoutes"
-import { ProfileContainer } from "@/containers/profile-container"
-import { ToggleContainer } from "@/containers/toggle-container"
+import { MainRoutes } from "@/lib/helper"
 import { useAuth } from "@clerk/clerk-react" // ✅ Missing import
 
-export const Header = () => {
-  const { userId } = useAuth()
+
+export const ToggleContainer = () => {
+    const { userId } = useAuth()
 
   return (
-    <header>
-      <Container className={cn("w-full border-b duration-150 transition-all ease-in-out")}>
-        <div className="flex items-center gap-4">
-          <LogoContainer />
 
-          {/* navigation */}
-          <nav className="hidden md:flex items-center gap-3">
-            <ul className="flex items-center gap-6">
-              {MainRoutes.map((route: { href: string; label: string }) => (
+    
+<Sheet>
+  <SheetTrigger className="block md:hidden">
+    <Menu/>
+
+  </SheetTrigger>
+  <SheetContent>
+    {/* <SheetHeader>
+      <SheetTitle>Are you absolutely sure?</SheetTitle>
+      <SheetDescription>
+        This action cannot be undone. This will permanently delete your account
+        and remove your data from our servers.
+      </SheetDescription>
+    </SheetHeader> */}
+    <nav>
+        <ul className="flex flex-col items-start gap-8">
+                   {MainRoutes.map((route: { href: string; label: string }) => (
                 <li key={route.href}>
                   <NavLink
                     to={route.href}
@@ -34,7 +49,6 @@ export const Header = () => {
                   </NavLink>
                 </li>
               ))}
-
               {userId && (
                 <NavLink
                   to="/generate"
@@ -48,18 +62,8 @@ export const Header = () => {
                   Take an Interview
                 </NavLink>
               )}
-            </ul>
-          </nav>
-
-          {/* profile */}
-          <div className="ml-auto flex items-center gap-6"> {/* ✅ 'flexx' → 'flex' */}
-            <ProfileContainer />
-            <div className="md:hidden">
-            <ToggleContainer />
-            </div>
-          </div>
-        </div>
-      </Container>
-    </header>
-  )
+        </ul>
+    </nav>
+  </SheetContent>
+</Sheet>  )
 }
