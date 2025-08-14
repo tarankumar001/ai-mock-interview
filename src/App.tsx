@@ -6,6 +6,8 @@ import ProtectedRoute from "./layouts/protected-route";
 import MainLayout from "./layouts/main-layout";
 import { Generate } from "./views/generate";
 import { Dashboard } from "./routes/dashboard";
+import { CreateEditPage } from './create-edit-page';
+
 
 export default function App() {
   return (
@@ -29,6 +31,7 @@ export default function App() {
         >
           <Route element={<Generate />} path="/generate">
             <Route index element={<Dashboard />} />
+            <Route path=":interviewId" element={<CreateEditPage />} />
           </Route>
         </Route>
       </Routes>
