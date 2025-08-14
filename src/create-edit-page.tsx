@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import type { Interview } from './types';
 import { db } from './config/firebase.config';
 import { doc, getDoc } from 'firebase/firestore';
+import { FormMockInterview } from './containers/form-mock-interview';
 
 export const CreateEditPage = () => {
   const { interviewId } = useParams<{ interviewId: string }>();
@@ -24,5 +25,7 @@ export const CreateEditPage = () => {
     fetchInterview();
   }, [interviewId]);
 
-  return <div>CreateEditPage : {interviewId}</div>;
+  return <div className="my-4 flex-col w-full"><FormMockInterview
+  initialData={interview}
+  /></div>;
 };
