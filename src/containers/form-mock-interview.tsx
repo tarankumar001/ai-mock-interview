@@ -1,100 +1,140 @@
-import { CustomBreadCrumb } from "@/components/ui/custom-breadcrums";
-import type { Interview } from "@/types";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@clerk/clerk-react";
-import { toast } from "sonner";
-import { Headings } from "@/components/ui/headings";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Trash2 } from "lucide-react";
+import type { Interview } from "@/types";
 
 interface FormMockInterviewProps {
   initialData: Interview | null;
 }
 
 const formSchema = z.object({
-  position: z
-    .string()
-    .min(1, "Position is required")
-    .max(100, "Position must be 100 characters or less"),
-  description: z.string().min(10, "Description is required"),
-  experience: z.coerce
-    .number()
-    .min(0, "Experience cannot be empty or negative"),
-  techStack: z.string().min(1, "Tech stack must be at least a character"),
+  position: z.string().min(1, { message: "Position is required" }),
+  description: z.string().min(1, { message: "Description is required" }),
+  experience: z.coerce.number().min(0, { message: "Experience is required" }),
+  techStack: z.string().min(1, { message: "Tech Stack is required" }),
 });
 
-type FormData = z.infer<typeof formSchema>;
-
 export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
-  const form = useForm<FormData>({
+  const loading = false;
+
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {},
+    defaultValues: initialData || {
+      position: "",
+      description: "",
+      experience: 0,
+      techStack: "",
+    },
   });
 
-  const { isValid, isSubmitted } = form.formState;
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { userId } = useAuth();
-
-  const title = initialData?.position
-    ? initialData.position
-    : "Create Mock Interview";
-
-  const breadcrumbPage = initialData?.position ? "Edit" : "Create";
-
-  const actions = initialData ? "Save Changes" : "Create";
-  const toastMessage = initialData
-    ? { title: "Updated..!", description: "Changes saved successfully..." }
-    : { title: "Created..!", description: "New Mock Interview created..." };
-
-  const onSubmit = async (data: FormData) => {
-    try {
-      setLoading(true);
-      // Your save logic here
-    } catch (error) {
-      console.error("Error saving interview:", error);
-      toast.error("Error..", {
-        description: "Something went wrong. Please try again later",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log(values);
+    // Your submit logic here (API call, etc.)
   };
 
-  useEffect(() => {
-    if (initialData) {
-      form.reset({
-        position: initialData.position,
-        description: initialData.description,
-        experience: initialData.experience,
-        techStack: initialData.techStack,
-      });
-    }
-  }, [initialData, form]);
-
   return (
-    <div className="w-full flex-col space-y-4">
-      {title}
-      <CustomBreadCrumb
-        breadCrumbPage={breadcrumbPage}
-        breadCrumpItems={[{ label: "Mock Interview", link: "/generate" }]}
-      />
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 w-full"
+      >
+        {/* Position Field */}
+        <FormField
+          control={form.control}
+          name="position"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Job Role /Job Position</FormLabel>
+              <FormControl>
+                <Input 
+                disabled={loading}
+                className="h-12"
+                placeholder="Enter job role or position" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <div className="mt-4 flex items-center justify-between w-full">
-        <Headings title={title} isSubHeading />
-        {initialData && (
-          <Button size="icon" variant="ghost">
-            <Trash2 className="min-w-4 min-h-4 text-red-500" />
-          </Button>
-        )}
-      </div>
+        {/* Description Field */}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <textarea
+                  placeholder="Enter a detailed description"
+                  {...field}
+                  className="border rounded p-2 w-full"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <Separator className="my-4" />
-    </div>
+        {/* Experience Field */}
+        <FormField
+          control={form.control}
+          name="experience"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Experience (in years)</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  {...field}
+                  onChange={(e) =>
+                    field.onChange(e.target.value ? +e.target.value : "")
+                  }
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Tech Stack Field */}
+        <FormField
+          control={form.control}
+          name="techStack"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tech Stack</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. React, Node.js" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Submit Button */}
+        <Button type="submit" disabled={loading}>
+          {initialData ? "Save Changes" : "Create"}
+        </Button>
+        <Button
+    type="button"
+    variant="outline"
+    onClick={() => form.reset()}
+  >
+    Reset
+  </Button>
+      </form>
+    </Form>
   );
 };
