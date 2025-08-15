@@ -41,6 +41,14 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
     // Your submit logic here (API call, etc.)
+    if(initialData){
+
+      // update
+
+    }else{
+      //create a new mock interview
+
+    }
   };
 
   return (
