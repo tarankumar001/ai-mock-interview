@@ -10,7 +10,7 @@ import { chatSession } from "@/scripts";
 import { db } from "@/config/firebase.config";
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 
-import  type { Interview } from "@/types";
+import type { Interview } from "../types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,7 +33,7 @@ interface FormMockInterviewProps {
 const formSchema = z.object({
   position: z.string().min(1, "Position is required").max(100, "Max 100 characters"),
   description: z.string().min(10, "Description is required"),
-  experience: z.coerce.number().min(0, "Experience cannot be negative"),
+  experience: z.number().min(0, "Experience cannot be negative"),
   techStack: z.string().min(1, "Tech stack is required")
 });
 
@@ -42,11 +42,11 @@ type FormData = z.infer<typeof formSchema>;
 export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      position: "",
-      description: "",
-      experience: 0,
-      techStack: ""
+    defaultValues: {
+      position: initialData?.position || "",
+      description: initialData?.description || "",
+      experience: initialData?.experience || 0,
+      techStack: initialData?.techStack || ""
     },
     mode: "onChange"
   });
@@ -67,21 +67,29 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
     const cleanAiResponse = (response: string) => {
       let cleanText = response.trim();
 
-      // Step 2: Remove any occurrences of "json" or code block symbols (``` or `)
-      cleanText = cleanText.replace(/(json|```|`)/g, "");
+      // Step 1: Remove markdown code blocks completely
+      cleanText = cleanText.replace(/```json\s*|\s*```/g, "");
+
+      // Step 2: Remove any remaining "json" text
+      cleanText = cleanText.replace(/json/g, "");
 
       // Step 3: Extract a JSON array by capturing text between square brackets
-      const jsonArrayMatch = cleanText.match(/\[.*\]/s);
+      const jsonArrayMatch = cleanText.match(/\[[\s\S]*\]/);
       if (jsonArrayMatch) {
         cleanText = jsonArrayMatch[0];
       } else {
         throw new Error("No JSON array found in response");
       }
       
-      // Step 4: Parse the clean JSON text into an array of objects
+      // Step 4: Clean up any extra whitespace and newlines
+      cleanText = cleanText.trim();
+      
+      // Step 5: Parse the clean JSON text into an array of objects
       try {
         return JSON.parse(cleanText);
       } catch (error) {
+        console.error("JSON Parse Error:", error);
+        console.error("Attempted to parse:", cleanText);
         throw new Error("Invalid JSON format: " + (error as Error)?.message);
       }
     };
@@ -104,8 +112,8 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
 
         The questions should assess skills in ${data?.techStack} development and best practices, problem-solving, and experience handling complex requirements.
 
-        Please format the output strictly as an array of JSON objects without any additional labels, code blocks, or explanations.
-        Return only the JSON array with questions and answers.
+        Please format the output strictly as a raw JSON array without any markdown formatting, code blocks, labels, or explanations.
+        Return ONLY the JSON array with questions and answers. Do not wrap in code blocks or any other markdown syntax.
       `;
       
       // Log the prompt to console for debugging
@@ -143,7 +151,7 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
               questions: aiResult,
               ...data,
               updatedAt: serverTimestamp(),
-            }).catch((error) => console.log(error));
+            }).catch((error) => console.error("Error generating AI response:", error));
             toast(toastMessage.title, { description: toastMessage.description });
           }
         } else {
@@ -164,9 +172,9 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
   
         navigate("/generate", { replace: true });
       } catch (error) {
-        console.log(error);
-        toast.error("Error..", {
-          description: `Something went wrong. Please try again later`,
+        console.error("Error submitting form: ", error);
+        toast.error("Error", {
+          description: "Something went wrong. Please try again later",
         });
       } finally {
         setLoading(false);
@@ -184,7 +192,7 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
     <div className="w-full flex-col space-y-4">
       <CustomBreadCrumb
         breadCrumbPage={breadCrumbPage}
-        breadCrumbItems={[{ label: "Mock Interviews", link: "/generate" }]}
+        breadCrumpItems={[{ label: "Mock Interviews", link: "/generate" }]}
       />
 
       <div className="mt-4 flex items-center justify-between">

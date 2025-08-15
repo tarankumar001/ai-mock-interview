@@ -1,4 +1,4 @@
-import type { User as AppUser } from "@/types";
+import type { User as AppUser } from "../types";
 import { db } from "@/config/firebase.config";
 import { useAuth, useUser } from "@clerk/clerk-react";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";

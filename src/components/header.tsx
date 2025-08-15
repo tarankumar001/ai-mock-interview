@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils"
 import { LogoContainer } from "./logo-container"
 import { NavLink } from "react-router-dom"
-import { MainRoutes } from "./MainRoutes"
+import { MainRoutes } from "@/lib/helper"
 import { ProfileContainer } from "@/containers/profile-container"
 import { ToggleContainer } from "@/containers/toggle-container"
 import { useAuth } from "@clerk/clerk-react"

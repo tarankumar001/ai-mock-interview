@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import type { Interview } from './types';
-import { db } from './config/firebase.config';
+import type { Interview } from '@/types';
+import { db } from '@/config/firebase.config';
 import { doc, getDoc } from 'firebase/firestore';
-import { FormMockInterview } from './containers/form-mock-interview';
+import { FormMockInterview } from '@/containers/form-mock-interview';
 
 export const CreateEditPage = () => {
   const { interviewId } = useParams<{ interviewId: string }>();

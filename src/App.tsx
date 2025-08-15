@@ -16,6 +16,7 @@ export default function App() {
         {/* public routes */}
         <Route path="/sign-in" element={<SignInPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
+        <Route path="/sign-in/sso-callback" element={<SignInPage />} />
 
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
@@ -29,8 +30,10 @@ export default function App() {
             </ProtectedRoute>
           }
         >
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route element={<Generate />} path="/generate">
             <Route index element={<Dashboard />} />
+            <Route path="create" element={<CreateEditPage />} />
             <Route path=":interviewId" element={<CreateEditPage />} />
           </Route>
         </Route>
