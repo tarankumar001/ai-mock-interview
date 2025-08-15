@@ -8,6 +8,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import { toast } from "sonner";
 import { Headings } from "@/components/ui/headings";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Trash2 } from "lucide-react";
 
 interface FormMockInterviewProps {
   initialData: Interview | null;
@@ -56,8 +59,7 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
     } catch (error) {
       console.error("Error saving interview:", error);
       toast.error("Error..", {
-        description:
-          "Something went wrong. Please try again later",
+        description: "Something went wrong. Please try again later",
       });
     } finally {
       setLoading(false);
@@ -82,10 +84,17 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
         breadCrumbPage={breadcrumbPage}
         breadCrumpItems={[{ label: "Mock Interview", link: "/generate" }]}
       />
-      <div className="mt-4 flex items-center juustify-between w-full">
-        <Headings title={title} isSubHeading/>
-        
+
+      <div className="mt-4 flex items-center justify-between w-full">
+        <Headings title={title} isSubHeading />
+        {initialData && (
+          <Button size="icon" variant="ghost">
+            <Trash2 className="min-w-4 min-h-4 text-red-500" />
+          </Button>
+        )}
       </div>
+
+      <Separator className="my-4" />
     </div>
   );
 };
