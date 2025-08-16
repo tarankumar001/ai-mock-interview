@@ -59,7 +59,7 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
                 onClick={() => {
                   navigate(`/generate/${interview.id}`, { replace: true }); // ✅ fixed
                 }}
-                disbaled={false}
+                disabled={false}
                 buttonClassName="hover:text-sky-500"
                 icon={<Pencil />} // ✅ icon works now
                 loading={false}
@@ -70,7 +70,7 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
                 onClick={() => {
                   navigate(`/generate/${interview.id}`, { replace: true }); // ✅ fixed
                 }}
-                disbaled={false}
+                disabled={false}
                 buttonClassName="hover:text-red-500"
                 icon={<Eye />} // ✅ icon works now
                 loading={false}
@@ -83,7 +83,7 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
                   replace: true,
                 });
               }}
-                disbaled={false}
+                disabled={false}
                 buttonClassName="hover:text-yellow-500"
                 icon={<Newspaper />} // ✅ icon works now
                 loading={false}
@@ -94,7 +94,7 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
                 onClick={() => {
                   navigate(`/generate/interview/${interview.id}`, { replace: true }); // ✅ fixed
                 }}
-                disbaled={false}
+                disabled={false}
                 buttonClassName="hover:text-sky-500"
                 icon={<Sparkles />} // ✅ icon works now
                 loading={false}
@@ -119,7 +119,7 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
                       });
                   }
                 }}
-                disbaled={loading}
+                disabled={loading}
                 buttonClassName="hover:text-red-500"
                 icon={<Trash2 />} // ✅ icon works now
                 loading={loading}

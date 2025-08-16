@@ -4,7 +4,7 @@ import useSpeechToText, { type ResultType } from 'react-hook-speech-to-text';
 import { useParams } from 'react-router';
 import { CircleStop, Loader, Mic, RefreshCw, Save, Video, VideoOff, WebcamIcon } from 'lucide-react';
 import { TooltipButton } from './ui/tool-tip';
-import { chatSession } from '@/scripts';
+// chatSession now imported dynamically where needed to support retry wrapper
 import { toast } from 'sonner';
 import { SaveModal } from './save-modal';
 import { addDoc, collection, getDocs, query, serverTimestamp, where } from 'firebase/firestore';
@@ -79,7 +79,10 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
     `;
 
     try {
-      const aiResult = await chatSession.sendMessage(prompt);
+      const aiResult = await (await import('@/scripts')).sendMessageWithRetry(prompt);
+      if (!aiResult) {
+        throw new Error('AI response was empty');
+      }
       const parsedResult: AIResponse = cleanJsonResponse(aiResult.response.text());
       return parsedResult;
     } catch (error) {
@@ -186,7 +189,7 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
           content="Save Result"
           icon={isAiGenerating ? <Loader className="min-w-5 min-h-5 animate-spin" /> : <Save className="min-w-5 min-h-5" />}
           onClick={() => setOpen(!open)}
-          disbaled={!aiResult} // ✅ fixed typo
+          disabled={!aiResult} // ✅ fixed typo
         />
       </div>
 

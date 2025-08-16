@@ -13,11 +13,13 @@ export const Header = () => {
   if (!isLoaded) return null
 
   return (
-    <header>
+    <header className="bg-background/50 backdrop-blur-sm">
       <div className="w-full border-b duration-150 transition-all ease-in-out">
-        <div className="container mx-auto px-4 md:px-8 py-4 w-full pr-0">
-          <div className="flex items-center gap-4">
-            <LogoContainer />
+        <div className="container mx-auto px-4 md:px-8 py-3 w-full pr-0">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center">
+              <LogoContainer />
+            </div>
 
             {/* navigation */}
             <nav className="hidden md:flex items-center gap-3">
@@ -55,7 +57,7 @@ export const Header = () => {
             </nav>
 
             {/* profile */}
-            <div className="ml-auto flex items-center">
+            <div className="ml-auto flex items-center gap-3">
               <ProfileContainer />
               <div className="md:hidden">
                 <ToggleContainer />

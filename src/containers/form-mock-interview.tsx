@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import { toast } from "sonner";
 
-import { chatSession } from "@/scripts";
+// chatSession now imported dynamically where needed to support retry wrapper
 import { db } from "@/config/firebase.config";
 import { addDoc, collection, doc, serverTimestamp, updateDoc, deleteDoc } from "firebase/firestore";
 
@@ -157,9 +157,12 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
       console.log("AI Prompt being sent:", prompt);
       console.log("Form data:", data);
       
-      const aiResult = await chatSession.sendMessage(prompt);
+      const aiResult = await (await import('@/scripts')).sendMessageWithRetry(prompt);
+      if (!aiResult) {
+        throw new Error('AI response was empty');
+      }
       console.log("Raw AI Response:", aiResult.response.text());
-      
+
       const cleanedResponse = cleanAiResponse(aiResult.response.text().trim());
       console.log("Cleaned AI Response (Parsed Questions):", cleanedResponse);
       

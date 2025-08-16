@@ -43,3 +43,48 @@ export const chatSession = model.startChat({
     generationConfig,
     safetySettings,
     }); 
+
+// Sends a prompt via chatSession with quota/rate-limit aware retries.
+export async function sendMessageWithRetry(prompt: string, maxRetries = 3) {
+  let attempt = 0;
+
+  const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+  while (attempt <= maxRetries) {
+    try {
+      const aiResult = await chatSession.sendMessage(prompt);
+      return aiResult;
+    } catch (err: any) {
+      attempt += 1;
+
+      const message = String(err?.message || err);
+
+      // If server returned RetryInfo like "retryDelay":"21s", try to extract seconds
+      const retryMatch = message.match(/"retryDelay"\s*:\s*"(\d+)s"/i);
+      let waitMs = 0;
+      if (retryMatch) {
+        const seconds = parseInt(retryMatch[1], 10);
+        if (!isNaN(seconds)) waitMs = (seconds + 1) * 1000; // add 1s buffer
+      } else if (/quota|rate limit|429/.test(message)) {
+        // Exponential backoff if no explicit retryDelay
+        waitMs = Math.min(30000, 1000 * Math.pow(2, attempt));
+      }
+
+      // If we've exhausted retries, throw the error upward
+      if (attempt > maxRetries) {
+        throw err;
+      }
+
+      // Wait before next retry if we got a suggested delay or backoff computed
+      if (waitMs > 0) {
+        // eslint-disable-next-line no-console
+        console.warn(`Chat API rate limited — retrying in ${waitMs}ms (attempt ${attempt}/${maxRetries})`);
+        await sleep(waitMs);
+        continue;
+      }
+
+      // If no clear path to retry, rethrow
+      throw err;
+    }
+  }
+}
