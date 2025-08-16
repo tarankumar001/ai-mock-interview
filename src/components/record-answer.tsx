@@ -1,5 +1,6 @@
 import { useAuth } from '@clerk/clerk-react';
 import { useState, useEffect } from 'react';
+import Webcam from 'react-webcam';
 import useSpeechToText, { type ResultType } from 'react-hook-speech-to-text';
 import { useParams } from 'react-router';
 import { CircleStop, Loader, Mic, RefreshCw, Save, Video, VideoOff, WebcamIcon } from 'lucide-react';
@@ -162,7 +163,20 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
       {/* Webcam Section */}
       <div className="w-full h-[400px] md:w-96 flex flex-col items-center justify-center border p-4 bg-gray-50 rounded-md">
         {isWebCam ? (
-          <div className="w-full h-full flex items-center justify-center bg-black text-white">Webcam Placeholder</div>
+          // Live webcam feed
+          <div className="w-full h-full flex items-center justify-center">
+            <Webcam
+              audio={false}
+              mirrored
+              className="w-full h-full object-cover rounded-md"
+              videoConstraints={{ facingMode: 'user' }}
+              onUserMediaError={(err) => {
+                console.error('Webcam error', err);
+                // show a simple error state
+                // Note: we keep this local; more sophisticated UI can be added later
+              }}
+            />
+          </div>
         ) : (
           <WebcamIcon className="min-w-24 min-h-24 text-muted-foreground" />
         )}
