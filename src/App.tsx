@@ -8,6 +8,7 @@ import { Generate } from "./views/generate";
 import { Dashboard } from "./routes/dashboard";
 import { CreateEditPage } from './create-edit-page';
 import { MockLoadPage } from "./routes/mock-load-page";
+import { MockInterviewPage } from "./routes/mock-interview-page";
 
 
 export default function App() {
@@ -39,6 +40,7 @@ export default function App() {
             {/* <Route path="create" element={<CreateEditPage />} /> */}
             <Route path=":interviewId" element={<CreateEditPage />} />
             <Route path=":interview/:interviewId" element={<MockLoadPage/>} />
+            <Route path=":interview/:interviewId/start" element={<MockInterviewPage/>} />
           </Route>
         </Route>
       </Routes>
