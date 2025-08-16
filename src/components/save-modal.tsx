@@ -8,8 +8,6 @@ interface SaveModalProps {
   loading: boolean;
 }
 
-import React from 'react'
-
 export const SaveModal = ({
     isOpen,
     onClose,

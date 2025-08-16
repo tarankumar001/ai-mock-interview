@@ -4,10 +4,9 @@ import { Button } from '@/components/ui/button';
 import { CustomBreadCrumb } from '@/components/ui/custom-bread-crumb';
 import { db } from '@/config/firebase.config';
 import type { Interview } from '@/types';
-import { LoaderPage } from '@/views/loader-page';
 import { doc, getDoc } from 'firebase/firestore';
 import { Lightbulb, Sparkles, WebcamIcon } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Webcam from "react-webcam"; // ✅ actual webcam component
 
@@ -15,7 +14,6 @@ export const MockLoadPage = () => {
   const { interviewId } = useParams<{ interviewId: string }>();
   const navigate = useNavigate();
   const [interview, setInterview] = useState<Interview | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isWebCamEnabled, setIsWebCamEnabled] = useState(false);
 
   if (!interviewId) {
@@ -39,10 +37,6 @@ export const MockLoadPage = () => {
     };
     fetchInterview();
   }, [interviewId]);
-
-  if (isLoading) {
-    return <LoaderPage className="w-full h-[70vh]" />;
-  }
 
   return (
     <div className="flex flex-col w-full gap-9 py-5">

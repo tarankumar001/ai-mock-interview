@@ -1,12 +1,11 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import type { Interview } from "../types";
 import { useNavigate } from 'react-router';
-import { useAuth } from '@clerk/clerk-react';
 import { Badge } from './ui/badge';
 import { Card, CardTitle, CardDescription, CardFooter } from './ui/card';
 import { cn } from '@/lib/utils';
 import { TooltipButton } from './ui/tool-tip';
-import { Eye, Newspaper, Pencil, Sparkle, Sparkles, Trash2 } from "lucide-react"; // ✅ import Trash2 icon
+import { Eye, Newspaper, Pencil, Sparkles, Trash2 } from "lucide-react";
 import { doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/config/firebase.config';
 import { toast } from 'sonner';
@@ -18,7 +17,6 @@ interface InterviewPinProps {
 
 export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProps) => {
   const navigate = useNavigate();
-  const { userId } = useAuth();
   const [loading, setLoading] = useState(false);
 
   return (

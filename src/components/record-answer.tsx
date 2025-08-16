@@ -1,5 +1,5 @@
 import { useAuth } from '@clerk/clerk-react';
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSpeechToText, { type ResultType } from 'react-hook-speech-to-text';
 import { useParams } from 'react-router';
 import { CircleStop, Loader, Mic, RefreshCw, Save, Video, VideoOff, WebcamIcon } from 'lucide-react';
@@ -23,7 +23,6 @@ interface AIResponse {
 
 export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerProps) => {
   const {
-    error,
     interimResult,
     isRecording,
     results,

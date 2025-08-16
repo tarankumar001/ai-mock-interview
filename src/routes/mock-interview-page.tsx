@@ -1,9 +1,8 @@
 import { CustomBreadCrumb } from '@/components/ui/custom-bread-crumb';
 import { db } from '@/config/firebase.config';
 import type { Interview } from '@/types';
-import { LoaderPage } from '@/views/loader-page';
 import { doc,  getDoc } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { AlertDescription, Alert, AlertTitle } from '@/components/ui/alert';
 import { Lightbulb } from 'lucide-react';
@@ -13,8 +12,7 @@ export const MockInterviewPage = () => {
 
     const { interviewId } = useParams<{ interviewId: string }>();
     const [interview, setInterview] = useState<Interview | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-const navigate=useNavigate();
+    const navigate = useNavigate();
 
   if (!interviewId) {
     navigate("/generate", { replace: true });
@@ -37,10 +35,6 @@ const navigate=useNavigate();
     };
     fetchInterview();
   }, [interviewId]);
-
-  if (isLoading) {
-    return <LoaderPage className="w-full h-[70vh]" />;
-  }
 
   return (
     <div className='flex flex-col w-full ggap-8 py-5'>

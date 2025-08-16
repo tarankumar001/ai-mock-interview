@@ -6,8 +6,8 @@ import type { Interview, UserAnswer } from '@/types';
 import { LoaderPage } from '@/views/loader-page';
 import { useAuth } from '@clerk/clerk-react';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
-import React, { useEffect, useMemo, useState } from 'react';
-import { replace, useNavigate, useParams } from 'react-router';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import {
   Accordion,
@@ -29,7 +29,8 @@ export const Feedback = () => {
   const navigate = useNavigate();
 
   if (!interviewId) {
-    return ("/generate", { replace: true });
+    navigate("/generate", { replace: true });
+    return null;
   }
 
   useEffect(() => {
@@ -131,7 +132,7 @@ export const Feedback = () => {
                 
               </AccordionTrigger>
                <AccordionContent className="px-5 py-6 bg-white rounded-b-lg space-y-5 shadow-inner">
-                                <div className="text-lg font-semibold to-gray-700">
+                                <div className="text-lg font-semibold text-gray-700">
                   <Star className="inline mr-2 text-yellow-400" />
                   Rating : {feed.rating}
                 </div>

@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader, Mail, Phone, MapPin } from "lucide-react";
+import { Loader, Mail } from "lucide-react";
 
 export const ContactPage = () => {
   const [formData, setFormData] = useState({
