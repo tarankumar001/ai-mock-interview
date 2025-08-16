@@ -141,6 +141,7 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
       console.error("Error saving user answer:", error);
     } finally {
       setLoading(false);
+      setOpen(!open);
     }
   };
 

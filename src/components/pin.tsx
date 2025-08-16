@@ -77,9 +77,11 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
               <TooltipButton
                 content="Feedback"
                 buttonVariant="ghost"
-                onClick={() => {
-                  navigate(`/generate/feedback${interview.id}`, { replace: true }); // ✅ fixed
-                }}
+              onClick={() => {
+                navigate(`/generate/feedback/${interview?.id}`, {
+                  replace: true,
+                });
+              }}
                 disbaled={false}
                 buttonClassName="hover:text-yellow-500"
                 icon={<Newspaper />} // ✅ icon works now
