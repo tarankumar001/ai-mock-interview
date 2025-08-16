@@ -102,6 +102,3 @@ Contributing & notes
 - Small PRs are welcome — bugfixes, UI improvements, tests.
 - If you add environment vars, update this README and avoid committing secrets.
 
-License & credits
-- Add `LICENSE` if you plan to publish.
-- Main packages: React, Vite, Tailwind, Clerk, Firebase, react-webcam, lucide-react, Google Generative AI SDK.
