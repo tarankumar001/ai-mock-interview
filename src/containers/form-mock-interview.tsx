@@ -140,19 +140,41 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
 
     const onSubmit = async (data: FormData) => {
       try {
+        // Check if user is authenticated
+        if (!userId) {
+          toast.error("Authentication Error", {
+            description: "Please sign in to create a mock interview",
+          });
+          return;
+        }
+
         setLoading(true);
   
         if (initialData) {
           // update
-          if (isValid) {
+          console.log("Updating interview with data:", { initialData, id: initialData.id, isValid });
+          if (isValid && initialData.id && initialData.id.trim() !== '') {
+            // Security check: ensure user can only update their own interviews
+            if (initialData.userId !== userId) {
+              toast.error("Access Denied", {
+                description: "You can only edit interviews that you created.",
+              });
+              return;
+            }
+            
             const aiResult = await generateAiResponse(data);
   
-            await updateDoc(doc(db, "interviews", initialData?.id), {
+            await updateDoc(doc(db, "interviews", initialData.id), {
               questions: aiResult,
               ...data,
               updatedAt: serverTimestamp(),
             }).catch((error) => console.error("Error generating AI response:", error));
             toast(toastMessage.title, { description: toastMessage.description });
+          } else if (!initialData.id || initialData.id.trim() === '') {
+            toast.error("Error", {
+              description: "Invalid interview data. Please try creating a new interview instead.",
+            });
+            return;
           }
         } else {
           // create a new mock interview
@@ -205,6 +227,14 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
       </div>
 
       <Separator className="my-4" />
+
+      {!userId && (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+          <p className="text-yellow-800 text-sm">
+            Please sign in to create or edit mock interviews.
+          </p>
+        </div>
+      )}
 
       <FormProvider {...form}>
         <form
@@ -277,7 +307,7 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
             <Button type="reset" variant="outline" disabled={isSubmitting || loading}>
               Reset
             </Button>
-            <Button type="submit" disabled={!isValid || isSubmitting || loading}>
+            <Button type="submit" disabled={!isValid || isSubmitting || loading || !userId}>
               {loading ? <Loader className="animate-spin" /> : actions}
             </Button>
           </div>

@@ -5,6 +5,8 @@ import { useAuth } from '@clerk/clerk-react';
 import { Badge } from './ui/badge';
 import { Card, CardTitle, CardDescription, CardFooter } from './ui/card';
 import { cn } from '@/lib/utils';
+import { TooltipButton } from './ui/tool-tip';
+import { Eye, Newspaper, Pencil, Sparkle, Sparkles } from "lucide-react"; // ✅ import Pencil icon
 
 interface InterviewPinProps {
   interview: Interview;
@@ -18,7 +20,6 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
 
   return (
     <Card className="p-4 rounded-md shadow-none hover:shadow-md shadow-gray-100 cursor-pointer transition-all">
-      {/* Removed space-y-4, replaced with controlled flex spacing */}
       <div className="flex flex-col gap-3.5"> 
         <CardTitle className="text-lg mb-0">{interview?.position}</CardTitle>
         <CardDescription className="mt-0">{interview?.description}</CardDescription>
@@ -49,9 +50,52 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
             })}`}
           </p>
 
-          {!onMockPage&&(
+          {!onMockPage && (
             <div className='flex items-center justify-center'>
-              
+              <TooltipButton
+                content="Edit"
+                buttonVariant="ghost"
+                onClick={() => {
+                  navigate(`/generate/${interview.id}`, { replace: true }); // ✅ fixed
+                }}
+                disabled={false}
+                buttonClassName="hover:text-sky-500"
+                icon={<Pencil />} // ✅ icon works now
+                loading={false}
+              />
+              <TooltipButton
+                content="view"
+                buttonVariant="ghost"
+                onClick={() => {
+                  navigate(`/generate/${interview.id}`, { replace: true }); // ✅ fixed
+                }}
+                disabled={false}
+                buttonClassName="hover:text-red-500"
+                icon={<Eye />} // ✅ icon works now
+                loading={false}
+              />
+              <TooltipButton
+                content="Feedback"
+                buttonVariant="ghost"
+                onClick={() => {
+                  navigate(`/generate/feedback${interview.id}`, { replace: true }); // ✅ fixed
+                }}
+                disabled={false}
+                buttonClassName="hover:text-yellow-500"
+                icon={<Newspaper />} // ✅ icon works now
+                loading={false}
+              />
+              <TooltipButton
+                content="Start"
+                buttonVariant="ghost"
+                onClick={() => {
+                  navigate(`/generate/${interview.id}`, { replace: true }); // ✅ fixed
+                }}
+                disabled={false}
+                buttonClassName="hover:text-sky-500"
+                icon={<Sparkles />} // ✅ icon works now
+                loading={false}
+              />
             </div>
           )}
 

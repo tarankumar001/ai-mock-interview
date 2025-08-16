@@ -16,7 +16,9 @@ export const CreateEditPage = () => {
         const docRef = doc(db, 'interviews', interviewId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setInterview(docSnap.data() as Interview);
+          const interviewData = docSnap.data() as Interview;
+          // Manually add the document ID to the interview data
+          setInterview({ ...interviewData, id: docSnap.id });
         }
       } catch (error) {
         console.error(error);
