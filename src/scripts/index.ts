@@ -8,7 +8,8 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY!;
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash-exp",
+  // switched to a larger-quota stable model to reduce free-tier 429s
+  model: "gemini-2.0-flash",
 });
 
 const generationConfig = {
