@@ -43,11 +43,11 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
           )}
         >
           <p className="text-[12px] text-muted-foreground truncate whitespace-nowrap">
-            {`${new Date(interview.createdAt.toDate()).toLocaleDateString("en-US", {
+            {`${interview.createdAt && 'toDate' in interview.createdAt ? new Date(interview.createdAt.toDate()).toLocaleDateString("en-US", {
               dateStyle: "long",
-            })} - ${new Date(interview.createdAt.toDate()).toLocaleTimeString("en-US", {
+            }) : 'Unknown date'} - ${interview.createdAt && 'toDate' in interview.createdAt ? new Date(interview.createdAt.toDate()).toLocaleTimeString("en-US", {
               timeStyle: "short",
-            })}`}
+            }) : 'Unknown time'}`}
           </p>
 
           {!onMockPage && (
@@ -58,7 +58,7 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
                 onClick={() => {
                   navigate(`/generate/${interview.id}`, { replace: true }); // ✅ fixed
                 }}
-                disabled={false}
+                disbaled={false}
                 buttonClassName="hover:text-sky-500"
                 icon={<Pencil />} // ✅ icon works now
                 loading={false}
@@ -69,7 +69,7 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
                 onClick={() => {
                   navigate(`/generate/${interview.id}`, { replace: true }); // ✅ fixed
                 }}
-                disabled={false}
+                disbaled={false}
                 buttonClassName="hover:text-red-500"
                 icon={<Eye />} // ✅ icon works now
                 loading={false}
@@ -80,7 +80,7 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
                 onClick={() => {
                   navigate(`/generate/feedback${interview.id}`, { replace: true }); // ✅ fixed
                 }}
-                disabled={false}
+                disbaled={false}
                 buttonClassName="hover:text-yellow-500"
                 icon={<Newspaper />} // ✅ icon works now
                 loading={false}
@@ -89,9 +89,9 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
                 content="Start"
                 buttonVariant="ghost"
                 onClick={() => {
-                  navigate(`/generate/${interview.id}`, { replace: true }); // ✅ fixed
+                  navigate(`/generate/interview/${interview.id}`, { replace: true }); // ✅ fixed
                 }}
-                disabled={false}
+                disbaled={false}
                 buttonClassName="hover:text-sky-500"
                 icon={<Sparkles />} // ✅ icon works now
                 loading={false}

@@ -7,6 +7,7 @@ import MainLayout from "./layouts/main-layout";
 import { Generate } from "./views/generate";
 import { Dashboard } from "./routes/dashboard";
 import { CreateEditPage } from './create-edit-page';
+import { MockLoadPage } from "./routes/mock-load-page";
 
 
 export default function App() {
@@ -32,11 +33,12 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/dashboard" element={<Dashboard />} />
+          {/* <Route path="/dashboard" element={<Dashboard />} /> */}
           <Route element={<Generate />} path="/generate">
             <Route index element={<Dashboard />} />
-            <Route path="create" element={<CreateEditPage />} />
+            {/* <Route path="create" element={<CreateEditPage />} /> */}
             <Route path=":interviewId" element={<CreateEditPage />} />
+            <Route path=":interview/:interviewId" element={<MockLoadPage/>} />
           </Route>
         </Route>
       </Routes>
