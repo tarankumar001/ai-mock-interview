@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { SignInPage, SignUpPage } from "./routes";
+import { SignInPage, SignUpPage, AboutPage, ContactPage } from "./routes";
 import { PublicLayout } from "./layouts/public-layout";
 import { HomePage } from "./routes/home-page"; // adjust path as needed
 import ProtectedRoute from "./layouts/protected-route";
@@ -20,6 +20,8 @@ export default function App() {
 
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
         </Route>
 
         {/* protected routes */}
