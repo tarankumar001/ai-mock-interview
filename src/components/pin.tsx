@@ -6,7 +6,10 @@ import { Badge } from './ui/badge';
 import { Card, CardTitle, CardDescription, CardFooter } from './ui/card';
 import { cn } from '@/lib/utils';
 import { TooltipButton } from './ui/tool-tip';
-import { Eye, Newspaper, Pencil, Sparkle, Sparkles } from "lucide-react"; // ✅ import Pencil icon
+import { Eye, Newspaper, Pencil, Sparkle, Sparkles, Trash2 } from "lucide-react"; // ✅ import Trash2 icon
+import { doc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/config/firebase.config';
+import { toast } from 'sonner';
 
 interface InterviewPinProps {
   interview: Interview;
@@ -97,6 +100,31 @@ export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProp
                 buttonClassName="hover:text-sky-500"
                 icon={<Sparkles />} // ✅ icon works now
                 loading={false}
+              />
+              <TooltipButton
+                content="Delete"
+                buttonVariant="ghost"
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to delete this interview?')) {
+                    setLoading(true);
+                    const interviewRef = doc(db, 'interviews', interview.id);
+                    deleteDoc(interviewRef)
+                      .then(() => {
+                        toast.success('Interview deleted successfully!');
+                        // Don't redirect - stay on current page
+                      })
+                      .catch((error) => {
+                        toast.error('Error deleting interview:', error);
+                      })
+                      .finally(() => {
+                        setLoading(false);
+                      });
+                  }
+                }}
+                disbaled={loading}
+                buttonClassName="hover:text-red-500"
+                icon={<Trash2 />} // ✅ icon works now
+                loading={loading}
               />
             </div>
           )}

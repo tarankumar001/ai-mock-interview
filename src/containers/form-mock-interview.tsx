@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 import { chatSession } from "@/scripts";
 import { db } from "@/config/firebase.config";
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, serverTimestamp, updateDoc, deleteDoc } from "firebase/firestore";
 
 import type { Interview } from "../types";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form";
-import { Loader, Trash2 } from "lucide-react";
+import { Loader, Trash2, ArrowLeft } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Headings } from "@/components/headings";
 import { CustomBreadCrumb } from "@/components/ui/custom-bread-crumb";
@@ -84,13 +84,50 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
       // Step 4: Clean up any extra whitespace and newlines
       cleanText = cleanText.trim();
       
-      // Step 5: Parse the clean JSON text into an array of objects
+      // Step 5: Try to parse the JSON, with fallback repair attempts
       try {
         return JSON.parse(cleanText);
       } catch (error) {
-        console.error("JSON Parse Error:", error);
+        console.error("Initial JSON Parse Error:", error);
         console.error("Attempted to parse:", cleanText);
-        throw new Error("Invalid JSON format: " + (error as Error)?.message);
+        
+        // Try to repair common JSON issues
+        try {
+          // Fix common issues: missing quotes around property names, trailing commas
+          let repairedJson = cleanText
+            .replace(/(\w+):/g, '"$1":') // Add quotes around property names
+            .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+            .replace(/,\s*}/g, '}') // Remove trailing commas before closing braces
+            .replace(/,\s*]/g, ']'); // Remove trailing commas before closing brackets
+          
+          return JSON.parse(repairedJson);
+        } catch (repairError) {
+          console.error("JSON Repair failed:", repairError);
+  ;
+          
+          // Last resort: try to extract just the questions and answers manually
+          try {
+            const questionMatches = cleanText.match(/"question"\s*:\s*"([^"]+)"/g);
+            const answerMatches = cleanText.match(/"answer"\s*:\s*"([^"]+)"/g);
+            
+            if (questionMatches && answerMatches && questionMatches.length === answerMatches.length) {
+              const questions = questionMatches.map(q => q.replace(/"question"\s*:\s*"/, '').replace(/"/, ''));
+              const answers = answerMatches.map(a => a.replace(/"answer"\s*:\s*"/, '').replace(/"/, ''));
+              
+              const result = questions.map((q, i) => ({
+                question: q,
+                answer: answers[i] || ''
+              }));
+              
+              console.log("Manual extraction successful:", result);
+              return result;
+            }
+          } catch (manualError) {
+            console.error("Manual extraction failed:", manualError);
+          }
+          
+          throw new Error("Invalid JSON format: " + (error as Error)?.message);
+        }
       }
     };
 
@@ -202,7 +239,29 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
         setLoading(false);
       }
     };
-  
+
+  const handleDelete = async () => {
+    if (!initialData?.id) return;
+    
+    if (window.confirm('Are you sure you want to delete this interview? This action cannot be undone.')) {
+      try {
+        setLoading(true);
+        const interviewRef = doc(db, 'interviews', initialData.id);
+        await deleteDoc(interviewRef);
+        toast.success('Interview deleted successfully!');
+        navigate('/generate');
+      } catch (error) {
+        console.error('Error deleting interview:', error);
+        toast.error('Failed to delete interview');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleBack = () => {
+    navigate('/generate');
+  };
 
   useEffect(() => {
     if (initialData) {
@@ -218,9 +277,26 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
       />
 
       <div className="mt-4 flex items-center justify-between">
-        <Headings title={title} isSubHeading />
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleBack}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <Headings title={title} isSubHeading />
+        </div>
         {initialData && (
-          <Button size="icon" variant="ghost">
+          <Button 
+            size="icon" 
+            variant="ghost" 
+            onClick={handleDelete}
+            disabled={loading}
+            className="hover:bg-red-50 hover:text-red-600"
+          >
             <Trash2 className="text-red-500" />
           </Button>
         )}
