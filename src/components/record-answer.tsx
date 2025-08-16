@@ -7,6 +7,8 @@ import { TooltipButton } from './ui/tool-tip';
 import { chatSession } from '@/scripts';
 import { toast } from 'sonner';
 import { SaveModal } from './save-modal';
+import { addDoc, collection, getDocs, query, serverTimestamp, where } from 'firebase/firestore';
+import { db } from '@/config/firebase.config';
 
 interface RecordAnswerProps {
   question: { question: string; answer: string };
@@ -43,19 +45,14 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
 
   const recordUserAnswer = async () => {
     if (isRecording) {
-      stopSpeechToText(); // ✅ fixed typo (was stopSpeedToText)
+      stopSpeechToText();
+
       if (userAnswer?.length < 30) {
-        toast.error("Error", {
-          description: "Your answer should be more than 30 characters",
-        });
+        toast.error("Error", { description: "Your answer should be more than 30 characters" });
         return;
       }
-      // ai results
-      const aiRes = await generateResult(
-        question.question,
-        question.answer,
-        userAnswer
-      ); 
+
+      const aiRes = await generateResult(question.question, question.answer, userAnswer);
       console.log(aiRes);
       setAiResult(aiRes);
     } else {
@@ -64,8 +61,7 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
   };
 
   const cleanJsonResponse = (responseText: string) => {
-    let cleanText = responseText.trim();
-    cleanText = cleanText.replace(/(json|```|`)/g, "");
+    let cleanText = responseText.trim().replace(/(json|```|`)/g, "");
     try {
       return JSON.parse(cleanText);
     } catch (error) {
@@ -73,11 +69,7 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
     }
   };
 
-  const generateResult = async (
-    qst: string,
-    qstAns: string,
-    userAns: string
-  ): Promise<AIResponse> => {
+  const generateResult = async (qst: string, qstAns: string, userAns: string): Promise<AIResponse> => {
     setIsAiGenerating(true);
     const prompt = `
       Question: "${qst}"
@@ -89,15 +81,11 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
 
     try {
       const aiResult = await chatSession.sendMessage(prompt);
-      const parsedResult: AIResponse = cleanJsonResponse(
-        aiResult.response.text()
-      );
+      const parsedResult: AIResponse = cleanJsonResponse(aiResult.response.text());
       return parsedResult;
     } catch (error) {
       console.log(error);
-      toast.error("Error", {
-        description: "An error occurred while generating feedback.",
-      });
+      toast.error("Error", { description: "An error occurred while generating feedback." });
       return { ratings: 0, feedback: "Unable to generate feedback" };
     } finally {
       setIsAiGenerating(false);
@@ -109,11 +97,52 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
     stopSpeechToText();
     startSpeechToText();
   };
-  
-  const saveUserAnswer=async()=>{
-    console.log(aiResult)
 
-  }
+  const saveUserAnswer = async () => {
+    console.log(aiResult);
+    setLoading(true);
+    if (!aiResult) return;
+
+    const currentQuestion = question.question;
+
+    try {
+      const userAnswerQuery = query(
+        collection(db, "userAnswers"),
+        where("userId", "==", userId),
+        where("question", "==", currentQuestion)
+      );
+
+      const querySnap = await getDocs(userAnswerQuery);
+
+      if (!querySnap.empty) {
+        console.log("Query Snap Size", querySnap.size);
+        toast.info("Already Answered", { description: "You have already answered this question" });
+        return;
+      } else {
+        await addDoc(collection(db, "userAnswers"), {
+          mockIdRef: interviewId,
+          question: question.question,
+          correct_ans: question.answer,
+          user_ans: userAnswer,
+          feedback: aiResult.feedback,
+          rating: aiResult.ratings,
+          userId,
+          createdAt: serverTimestamp(),
+        });
+
+        toast("Saved", { description: "Your answer has been saved successfully!" });
+      }
+
+      setUserAnswer("");
+      stopSpeechToText();
+
+    } catch (error) {
+      toast.error("Error", { description: "An error occurred while saving your answer." });
+      console.error("Error saving user answer:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const combinedTranscripts = results
@@ -125,18 +154,12 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
 
   return (
     <div className="w-full flex flex-col items-center gap-8 mt-4">
-        <SaveModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={saveUserAnswer}
-        loading={loading}
-      />
+      <SaveModal isOpen={open} onClose={() => setOpen(false)} onConfirm={saveUserAnswer} loading={loading} />
+
       {/* Webcam Section */}
       <div className="w-full h-[400px] md:w-96 flex flex-col items-center justify-center border p-4 bg-gray-50 rounded-md">
         {isWebCam ? (
-          <div className="w-full h-full flex items-center justify-center bg-black text-white">
-            Webcam Placeholder
-          </div>
+          <div className="w-full h-full flex items-center justify-center bg-black text-white">Webcam Placeholder</div>
         ) : (
           <WebcamIcon className="min-w-24 min-h-24 text-muted-foreground" />
         )}
@@ -161,15 +184,9 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
         />
         <TooltipButton
           content="Save Result"
-          icon={
-            isAiGenerating ? (
-              <Loader className="min-w-5 min-h-5 animate-spin" />
-            ) : (
-              <Save className="min-w-5 min-h-5" />
-            )
-          }
+          icon={isAiGenerating ? <Loader className="min-w-5 min-h-5 animate-spin" /> : <Save className="min-w-5 min-h-5" />}
           onClick={() => setOpen(!open)}
-          disbaled={!aiResult} // ✅ fixed `disbaled` typo
+          disbaled={!aiResult} // ✅ fixed typo
         />
       </div>
 
