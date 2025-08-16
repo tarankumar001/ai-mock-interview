@@ -42,7 +42,7 @@ export default function App() {
             <Route path=":interviewId" element={<CreateEditPage />} />
             <Route path=":interview/:interviewId" element={<MockLoadPage/>} />
             <Route path=":interview/:interviewId/start" element={<MockInterviewPage/>} />
-            <Route path="feedback/:interviewId" element={<Feedback />} />
+            <Route path="feedback/:interviewId" element={<Feedback/>} />
           </Route>
         </Route>
       </Routes>
