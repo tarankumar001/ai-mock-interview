@@ -1,5 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import type { Interview } from "../types";
+import { useNavigate } from 'react-router';
+import { useAuth } from '@clerk/clerk-react';
+import { Badge } from './ui/badge';
+import { Card, CardTitle, CardDescription, CardFooter } from './ui/card';
+import { cn } from '@/lib/utils';
 
 interface InterviewPinProps {
   interview: Interview;
@@ -7,20 +12,51 @@ interface InterviewPinProps {
 }
 
 export const InterviewPin = ({ interview, onMockPage = false }: InterviewPinProps) => {
+  const navigate = useNavigate();
+  const { userId } = useAuth();
+  const [loading, setLoading] = useState(false);
+
   return (
-    <div className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
-      <h3 className="font-semibold text-lg mb-2">{interview.position}</h3>
-      <p className="text-sm text-gray-600 mb-2">{interview.description}</p>
-      <div className="flex items-center gap-2 text-xs text-gray-500">
-        <span>{interview.experience} years exp</span>
-        <span>•</span>
-        <span>{interview.techStack}</span>
-      </div>
-      {onMockPage && (
-        <div className="mt-3 text-xs text-gray-500">
-          {interview.questions.length} questions
+    <Card className="p-4 rounded-md shadow-none hover:shadow-md shadow-gray-100 cursor-pointer transition-all">
+      {/* Removed space-y-4, replaced with controlled flex spacing */}
+      <div className="flex flex-col gap-3.5"> 
+        <CardTitle className="text-lg mb-0">{interview?.position}</CardTitle>
+        <CardDescription className="mt-0">{interview?.description}</CardDescription>
+        
+        <div className="w-full flex items-center gap-2 flex-wrap mt-1"> 
+          {interview.techStack.split(',').map((word, index) => (
+            <Badge
+              key={index}
+              variant="outline"
+              className="text-xs text-muted-foreground hover:border-emerald-400 hover:bg-emerald-50 hover:text-emerald-900"
+            >
+              {word.trim()}
+            </Badge>
+          ))}
         </div>
-      )}
-    </div>
-  )
-}
+
+        <CardFooter
+          className={cn(
+            "w-full flex items-center p-0 mt-1",
+            onMockPage ? "justify-end" : "justify-between"
+          )}
+        >
+          <p className="text-[12px] text-muted-foreground truncate whitespace-nowrap">
+            {`${new Date(interview.createdAt.toDate()).toLocaleDateString("en-US", {
+              dateStyle: "long",
+            })} - ${new Date(interview.createdAt.toDate()).toLocaleTimeString("en-US", {
+              timeStyle: "short",
+            })}`}
+          </p>
+
+          {!onMockPage&&(
+            <div className='flex items-center justify-center'>
+              
+            </div>
+          )}
+
+        </CardFooter>
+      </div>
+    </Card>
+  );
+};
