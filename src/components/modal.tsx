@@ -29,7 +29,7 @@ import {
   
     return (
       <Dialog open={isOpen} onOpenChange={onChange}>
-        <DialogContent className="max-w-[95vw] sm:max-w-lg mx-4">
+        <DialogContent className="max-w-[95vw] sm:max-w-lg mx-4 transform-none">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg">{title}</DialogTitle>
             <DialogDescription className="text-sm leading-relaxed">
