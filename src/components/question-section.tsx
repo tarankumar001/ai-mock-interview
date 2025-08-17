@@ -16,7 +16,6 @@ interface QuestionSectionProps {
 export const QuestionSection = ({ questions }: QuestionSectionProps) => {
   const [isPlaying,setIsPlaying]=useState(false);
   const [isWebCam,setIsWebCam]=useState(false);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(new Set());
 
   const [currentSpeech,setCurrentSpeech]=useState<SpeechSynthesisUtterance | null>(null)
@@ -40,13 +39,6 @@ export const QuestionSection = ({ questions }: QuestionSectionProps) => {
           setCurrentSpeech(null);
         }
       }
-    }
-  };
-
-  const handleQuestionChange = (value: string) => {
-    const index = questions.findIndex(q => q.question === value);
-    if (index !== -1) {
-      setCurrentQuestionIndex(index);
     }
   };
 
@@ -116,7 +108,7 @@ export const QuestionSection = ({ questions }: QuestionSectionProps) => {
       <Tabs 
         defaultValue={questions[0]?.question} 
         className="w-full"
-        onValueChange={handleQuestionChange}
+        onValueChange={() => {}}
       >
         <div className="overflow-x-auto">
           <TabsList className="bg-transparent w-full flex flex-wrap items-center justify-start gap-2 sm:gap-4 mb-4 min-w-max">

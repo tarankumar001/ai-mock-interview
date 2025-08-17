@@ -3,11 +3,6 @@ import { Link } from 'react-router-dom';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
-  
-  // Update these with your actual information
-  const GITHUB_USERNAME = "your-github-username"; // Replace with your actual GitHub username
-  const LINKEDIN_URL = "https://linkedin.com/in/your-profile"; // Replace with your LinkedIn profile
-  const EMAIL = "your-email@example.com"; // Replace with your email
 
   return (
     <footer className="bg-gray-900 text-white py-8 mt-auto">
@@ -34,7 +29,7 @@ export const Footer = () => {
           {/* Right side - Social Links */}
           <div className="flex items-center gap-4">
             <a
-              href={`https://github.com/tarankumar001`}
+              href="https://github.com/tarankumar001"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300 group"
@@ -45,7 +40,7 @@ export const Footer = () => {
             </a>
             
             <a
-              href={"https://www.linkedin.com/in/tarankumar-p-954948257/"}
+              href="https://www.linkedin.com/in/tarankumar-p-954948257/"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300 group"
@@ -56,7 +51,7 @@ export const Footer = () => {
             </a>
             
             <a
-              href={`mailto:ptarankumar@gmail.com`}
+              href="mailto:ptarankumar@gmail.com"
               className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300 group"
               title="Send Email"
             >

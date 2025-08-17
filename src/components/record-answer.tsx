@@ -24,7 +24,7 @@ interface AIResponse {
   feedback: string;
 }
 
-export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerProps) => {
+export const RecordAnswer = ({ question, isWebCam, setIsWebCam, onAnswerSaved }: RecordAnswerProps) => {
   const {
     interimResult,
     isRecording,
