@@ -143,4 +143,38 @@
   .card-smooth {
     @apply rounded-lg shadow-sm bg-card text-card-foreground;
   }
+
+  /* Mobile-specific improvements */
+  @media (max-width: 640px) {
+    /* Prevent text overflow on small screens */
+    .text-overflow-safe {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    
+    /* Better touch targets for mobile */
+    button, [role="button"], .cursor-pointer {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Prevent horizontal scrolling */
+    .overflow-x-hidden {
+      overflow-x: hidden;
+    }
+    
+    /* Better spacing for mobile */
+    .mobile-gap {
+      gap: 0.75rem;
+    }
+  }
+
+  /* Ensure proper z-index stacking for modals */
+  .modal-overlay {
+    z-index: 50;
+  }
+  
+  .modal-content {
+    z-index: 51;
+  }
 }

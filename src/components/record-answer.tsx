@@ -2,19 +2,21 @@ import { useAuth } from '@clerk/clerk-react';
 import { useState, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import useSpeechToText, { type ResultType } from 'react-hook-speech-to-text';
-import { useParams } from 'react-router';
-import { CircleStop, Loader, Mic, RefreshCw, Save, Video, VideoOff, WebcamIcon } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router';
+import { CircleStop, Loader, Mic, RefreshCw, Save, Video, VideoOff, WebcamIcon, Home, Eye, ArrowRight } from 'lucide-react';
 import { TooltipButton } from './ui/tool-tip';
 // chatSession now imported dynamically where needed to support retry wrapper
 import { toast } from 'sonner';
 import { SaveModal } from './save-modal';
 import { addDoc, collection, getDocs, query, serverTimestamp, where } from 'firebase/firestore';
 import { db } from '@/config/firebase.config';
+import { Button } from './ui/button';
 
 interface RecordAnswerProps {
   question: { question: string; answer: string };
   isWebCam: boolean;
   setIsWebCam: (value: boolean) => void;
+  onAnswerSaved?: () => void;
 }
 
 interface AIResponse {
@@ -39,9 +41,11 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
   const [aiResult, setAiResult] = useState<AIResponse | null>(null);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [answerSaved, setAnswerSaved] = useState(false);
 
   const { userId } = useAuth();
   const { interviewId } = useParams();
+  const navigate = useNavigate();
 
   const recordUserAnswer = async () => {
     if (isRecording) {
@@ -99,12 +103,33 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
     setUserAnswer("");
     stopSpeechToText();
     startSpeechToText();
+    setAnswerSaved(false);
   };
 
   const saveUserAnswer = async () => {
-    console.log(aiResult);
+    console.log("Save button clicked, aiResult:", aiResult);
     setLoading(true);
-    if (!aiResult) return;
+    
+    if (!aiResult) {
+      console.error("No AI result available");
+      toast.error("Error", { description: "No feedback available to save. Please record and analyze your answer first." });
+      setLoading(false);
+      return;
+    }
+
+    if (!userId) {
+      console.error("No user ID available");
+      toast.error("Error", { description: "User not authenticated. Please sign in again." });
+      setLoading(false);
+      return;
+    }
+
+    if (!interviewId) {
+      console.error("No interview ID available");
+      toast.error("Error", { description: "Interview session not found. Please refresh the page." });
+      setLoading(false);
+      return;
+    }
 
     const currentQuestion = question.question;
 
@@ -122,7 +147,7 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
         toast.info("Already Answered", { description: "You have already answered this question" });
         return;
       } else {
-        await addDoc(collection(db, "userAnswers"), {
+        const docRef = await addDoc(collection(db, "userAnswers"), {
           mockIdRef: interviewId,
           question: question.question,
           correct_ans: question.answer,
@@ -133,19 +158,34 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
           createdAt: serverTimestamp(),
         });
 
+        console.log("Answer saved successfully with ID:", docRef.id);
         toast("Saved", { description: "Your answer has been saved successfully!" });
+        setAnswerSaved(true);
+        
+        // Notify parent component that answer was saved
+        if (onAnswerSaved) {
+          onAnswerSaved();
+        }
       }
 
       setUserAnswer("");
       stopSpeechToText();
 
     } catch (error) {
-      toast.error("Error", { description: "An error occurred while saving your answer." });
       console.error("Error saving user answer:", error);
+      toast.error("Error", { description: "An error occurred while saving your answer. Please try again." });
     } finally {
       setLoading(false);
-      setOpen(!open);
+      setOpen(false);
     }
+  };
+
+  const goToDashboard = () => {
+    navigate("/generate");
+  };
+
+  const viewFeedback = () => {
+    navigate(`/generate/feedback/${interviewId}`);
   };
 
   useEffect(() => {
@@ -157,11 +197,11 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
   }, [results]);
 
   return (
-    <div className="w-full flex flex-col items-center gap-8 mt-4">
+    <div className="w-full flex flex-col items-center gap-4 sm:gap-8 mt-4">
       <SaveModal isOpen={open} onClose={() => setOpen(false)} onConfirm={saveUserAnswer} loading={loading} />
 
       {/* Webcam Section */}
-      <div className="w-full h-[400px] md:w-96 flex flex-col items-center justify-center border p-4 bg-gray-50 rounded-md">
+      <div className="w-full h-[300px] sm:h-[400px] md:w-96 flex flex-col items-center justify-center border p-2 sm:p-4 bg-gray-50 rounded-md">
         {isWebCam ? (
           // Live webcam feed
           <div className="w-full h-full flex items-center justify-center">
@@ -178,12 +218,12 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
             />
           </div>
         ) : (
-          <WebcamIcon className="min-w-24 min-h-24 text-muted-foreground" />
+          <WebcamIcon className="min-w-20 min-h-20 sm:min-w-24 sm:min-h-24 text-muted-foreground" />
         )}
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 w-full">
         <TooltipButton
           content={isWebCam ? "Turn Off" : "Turn On"}
           icon={isWebCam ? <VideoOff className="min-w-5 min-h-5" /> : <Video className="min-w-5 min-h-5" />}
@@ -202,23 +242,57 @@ export const RecordAnswer = ({ question, isWebCam, setIsWebCam }: RecordAnswerPr
         <TooltipButton
           content="Save Result"
           icon={isAiGenerating ? <Loader className="min-w-5 min-h-5 animate-spin" /> : <Save className="min-w-5 min-h-5" />}
-          onClick={() => setOpen(!open)}
-          disabled={!aiResult} // ✅ fixed typo
+          onClick={() => setOpen(true)}
+          disabled={!aiResult || isAiGenerating}
         />
       </div>
 
       {/* Answer Section */}
-      <div className="w-full mt-4 p-4 border rounded-md bg-gray-50">
-        <h2 className="text-lg font-semibold">Your Answer</h2>
-        <p className="text-sm mt-2 text-gray-700 whitespace-normal">
-          {userAnswer || "Start recording to see your answer here"}
-        </p>
-        {interimResult && (
-          <p className="text-sm text-gray-500 mt-2">
-            <strong>Current Speech:</strong> {interimResult}
+      <div className="w-full mt-4 p-3 sm:p-4 border rounded-md bg-gray-50">
+        <h2 className="text-base sm:text-lg font-semibold mb-2">Your Answer</h2>
+        <div className="min-h-[60px]">
+          <p className="text-sm mt-2 text-gray-700 whitespace-pre-wrap break-words">
+            {userAnswer || "Start recording to see your answer here"}
           </p>
-        )}
+          {interimResult && (
+            <p className="text-sm text-gray-500 mt-2">
+              <strong>Current Speech:</strong> {interimResult}
+            </p>
+          )}
+        </div>
       </div>
+
+      {/* Navigation Section - Show after answer is saved */}
+      {answerSaved && (
+        <div className="w-full mt-4 p-4 border rounded-md bg-emerald-50 border-emerald-200">
+          <h3 className="text-base sm:text-lg font-semibold mb-3 text-emerald-800">Answer Saved Successfully!</h3>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              onClick={goToDashboard}
+              variant="outline"
+              className="flex items-center gap-2 w-full sm:w-auto"
+            >
+              <Home className="min-w-4 min-h-4" />
+              Back to Dashboard
+            </Button>
+            <Button
+              onClick={viewFeedback}
+              className="bg-emerald-600 hover:bg-emerald-700 flex items-center gap-2 w-full sm:w-auto"
+            >
+              <Eye className="min-w-4 min-h-4" />
+              View Feedback
+            </Button>
+            <Button
+              onClick={() => setAnswerSaved(false)}
+              variant="ghost"
+              className="flex items-center gap-2 w-full sm:w-auto"
+            >
+              <ArrowRight className="min-w-4 min-h-4" />
+              Continue Interview
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

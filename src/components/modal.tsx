@@ -29,10 +29,12 @@ import {
   
     return (
       <Dialog open={isOpen} onOpenChange={onChange}>
-        <DialogContent>
+        <DialogContent className="max-w-[95vw] sm:max-w-lg mx-4">
           <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">{title}</DialogTitle>
+            <DialogDescription className="text-sm leading-relaxed">
+              {description}
+            </DialogDescription>
           </DialogHeader>
   
           <div>{children}</div>

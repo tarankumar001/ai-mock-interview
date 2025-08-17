@@ -7,7 +7,7 @@ interface ContainerProps {
 
 export const Container = ({ children, className }: ContainerProps) => {
   return (
-    <div className={cn("container px-4 md:px-8 py-4 w-full", className)} style={{ marginLeft: 0, marginRight: 0 }}>
+    <div className={cn("container px-3 sm:px-4 md:px-8 py-3 sm:py-4 w-full", className)} style={{ marginLeft: 0, marginRight: 0 }}>
       {children}
     </div>
   );

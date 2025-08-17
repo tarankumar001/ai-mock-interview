@@ -1,11 +1,24 @@
 import { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { useAuth } from '@clerk/clerk-react';
 
 export const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { isSignedIn } = useAuth();
+  const navigate = useNavigate();
+
+  const handleTryItOut = () => {
+    if (isSignedIn) {
+      // User is logged in, redirect to take interview
+      navigate('/generate');
+    } else {
+      // User is not logged in, redirect to sign in
+      navigate('/sign-in');
+    }
+  };
 
   return (
     <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-slate-50 via-pink-50 to-purple-50 overflow-hidden relative font-['Inter']">
@@ -85,12 +98,14 @@ export const HomePage = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <Link to="/sign-up">
-              <Button size="lg" className="bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white px-8 py-4 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group font-['Inter'] font-medium">
-                Try it out
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white px-8 py-4 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group font-['Inter'] font-medium"
+              onClick={handleTryItOut}
+            >
+              {isSignedIn ? 'Take Interview' : 'Check it out'}
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+            </Button>
           </motion.div>
 
           {/* Material UI Feature Cards */}

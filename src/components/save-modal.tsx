@@ -21,13 +21,13 @@ export const SaveModal = ({
       isOpen={isOpen}
       onClose={onClose}
     >
-      <div className="pt-6 space-x-2 flex items-center justify-end w-full">
-        <Button disabled={loading} variant={"outline"} onClick={onClose}>
+      <div className="pt-6 space-y-3 sm:space-y-0 sm:space-x-2 flex flex-col sm:flex-row items-center justify-end w-full">
+        <Button disabled={loading} variant={"outline"} onClick={onClose} className="w-full sm:w-auto">
           Cancel
         </Button>
         <Button
           disabled={loading}
-          className="bg-emerald-600 hover:bg-emerald-800"
+          className="bg-emerald-600 hover:bg-emerald-800 w-full sm:w-auto"
           onClick={onConfirm}
         >
           Continue

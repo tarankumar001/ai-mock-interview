@@ -25,7 +25,7 @@ import {
     buttonVariant?: ButtonVariant;
     buttonClassName?: string;
     delay?: number;
-  disabled?: boolean;
+    disabled?: boolean;
     loading?: boolean;
   }
   
@@ -50,7 +50,7 @@ import {
               size={"icon"}
               disabled={disabled}
               variant={buttonVariant}
-              className={buttonClassName}
+              className={`min-h-[44px] min-w-[44px] sm:min-h-[40px] sm:min-w-[40px] ${buttonClassName}`}
               onClick={onClick}
             >
               {loading ? (
@@ -60,7 +60,7 @@ import {
               )}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent className="hidden sm:block">
             <p>{loading ? "Loading..." : content}</p>
           </TooltipContent>
         </Tooltip>
